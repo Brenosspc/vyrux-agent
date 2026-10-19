@@ -1,3 +1,6 @@
+cd ~/vyrux-repo
+
+cat << 'EOF' > README.md
 # 🛡️ Vyrux — Local Cybersecurity Agent (PoC)
 
 **Vyrux** é uma Prova de Conceito (PoC) de um assistente local de cibersegurança focado na automação de diagnósticos de rede e análise de conectividade. O agente utiliza um Modelo de Linguagem Local (LLM) rodando via **Ollama** e uma interface de execução segura com autorização humana (*Human-in-the-Loop*).
@@ -5,6 +8,7 @@
 ---
 
 ## 📋 Sumário
+
 - [Arquitetura e Funcionalidades](#-arquitetura-e-funcionalidades)
 - [Ambiente de Testes (CyberLab)](#-ambiente-de-testes-cyberlab)
 - [Pré-requisitos do Sistema](#-pré-requisitos-do-sistema)
@@ -19,8 +23,8 @@
 ## 🚀 Arquitetura e Funcionalidades
 
 - **Engine Local:** Execução 100% offline e privada utilizando **Ollama** com o modelo `llama3.2:1b`.
-- **Human-in-the-Loop (HITL):** Nenhum comando do sistema operacional é executado sem a confirmação e autorização explícita do operador (`s/N`).
-- **Whitelist de Segurança:** Restrição estrita de execução aos comandos de diagnóstico de rede permitidos (`ping`, `nmap`, `dig`, `traceroute`, `curl`).
+- **Human-in-the-Loop (HITL):** Nenhum comando do sistema operacional é executado sem a confirmação e autorização explícita do operador ( `s/N` ).
+- **Whitelist de Segurança:** Restrição estrita de execução aos comandos de diagnóstico de rede permitidos ( `ping` , `nmap` , `dig` , `traceroute` , `curl` ).
 - **Baixa Latência:** Extração otimizada via Expressão Regular (Regex) das tags `<cmd>`, garantindo respostas em poucos segundos.
 
 ---
@@ -28,103 +32,87 @@
 ## 🧪 Ambiente de Testes (CyberLab)
 
 A PoC foi validada em um ambiente virtualizado e isolado no VirtualBox:
-- **Agente (Vyrux):** Ubuntu Guest OS (`192.168.100.1`)
-- **Alvo de Testes:** Metasploitable2 (`192.168.100.2`)
-- **Rede:** Rede Interna Isolada (`CyberLab`) com IPs estáticos e modo promíscuo ativado.
+
+- **Agente (Vyrux):** Ubuntu Guest OS ( `192.168.100.1` )
+- **Alvo de Testes:** Metasploitable2 ( `192.168.100.2` )
+- **Rede:** Rede Interna Isolada ( `CyberLab` ) com IPs estáticos e modo promíscuo ativado.
 
 ---
 
 ## ⚙️ Pré-requisitos do Sistema
 
-Antes de instalar o Vyrux, certifique-se de que seu sistema operacional (Linux/Ubuntu) possui os seguintes pacotes instalados:
+Certifique-se de que o sistema possui as seguintes ferramentas instaladas antes de prosseguir:
 
-1. **Python 3.10+** e suporte a ambiente virtual (`venv`):
-   ```bash
-   sudo apt update
-   sudo apt install -y python3 python3-venv python3-pip git
-Ferramentas de Rede:
+- **Pacotes Base do Sistema (Python e Git):**
+  - Comando: `sudo apt update && sudo apt install -y python3 python3-venv python3-pip git`
+- **Ferramentas de Diagnóstico de Rede:**
+  - Comando: `sudo apt install -y nmap iputils-ping dnsutils traceroute curl`
+- **Ollama (Engine LLM Local):**
+  - Instalação: `curl -fsSL https://ollama.com/install.sh | sh`
+  - Download do modelo: `ollama pull llama3.2:1b`
 
-Bash
-sudo apt install -y nmap iputils-ping dnsutils traceroute curl
-Ollama (Engine LLM Local):
+---
 
-Instale o Ollama conforme as instruções oficiais:
+## 🛠️ Guia de Instalação e Configuração
 
-Bash
-curl -fsSL [https://ollama.com/install.sh](https://ollama.com/install.sh) | sh
-Baixe o modelo leve llama3.2:1b:
-
-Bash
-ollama pull llama3.2:1b
-🛠️ Guia de Instalação e Configuração
 Siga os passos abaixo para preparar e executar o ambiente do Vyrux:
 
-Clonar o Repositório:
+- **Passo 1: Clonar o Repositório**
+  - `git clone https://github.com/Brenosspc/vyrux-agent.git`
+  - `cd vyrux-agent`
+- **Passo 2: Criar e Ativar o Ambiente Virtual Python**
+  - `python3 -m venv vyrux-env`
+  - `source vyrux-env/bin/activate`
+- **Passo 3: Instalar as Dependências**
+  - `pip install -r requirements.txt`
 
-Bash
-git clone [https://github.com/Brenosspc/vyrux-agent.git](https://github.com/Brenosspc/vyrux-agent.git)
-cd vyrux-agent
-Criar e Ativar o Ambiente Virtual Python:
+---
 
-Bash
-python3 -m venv vyrux-env
-source vyrux-env/bin/activate
-Instalar as Dependências:
+## 📖 Como Utilizar o Vyrux
 
-Bash
-pip install -r requirements.txt
-📖 Como Utilizar o Vyrux
-Garantir que o Serviço do Ollama está Ativo:
-Em uma janela do terminal (ou em segundo plano), verifique se o Ollama está rodando:
+- **1. Verificar o Serviço do Ollama:**
+  - Certifique-se de que o Ollama está ativo rodando: `ollama list`
+- **2. Iniciar o Agente:**
+  - Execute o script principal com o ambiente virtual ativo: `python vyrux.py`
+- **3. Exemplos de Prompts em Linguagem Natural:**
+  - **Varredura de Rede:** `"Faça um scan de portas no IP 192.168.100.2 e me diga os serviços ativos."`
+  - **Teste de Conectividade:** `"Verifique se o IP 192.168.100.2 está acessível na rede."`
+  - **Dúvidas Conceituais:** `"O que é o serviço vsftpd 2.3.4 e por que ele é considerado vulnerável?"`
+- **4. Fluxo de Autorização de Comandos (HITL):**
+  - Quando o Vyrux sugere um comando (ex: `[Vyrux] Comando sugerido: nmap -sV 192.168.100.2`), confirme com `s` para aprovar ou `n` para recusar.
+- **5. Encerrar o Agente:**
+  - Digite `sair` ou `exit` a qualquer momento para fechar o programa.
 
-Bash
-ollama list
-Iniciar o Agente:
-Com o ambiente virtual ativado ((vyrux-env) no prompt), execute o script principal:
+---
 
-Bash
-python vyrux.py
-Exemplos de Interação:
-Você pode interagir em linguagem natural. O agente identificará se precisa rodar um comando ou apenas responder com explicações técnicas:
+## 📂 Estrutura do Repositório
 
-Varredura de Rede: "Faça um scan de portas no IP 192.168.100.2 e me diga os serviços ativos."
+- **`vyrux.py`:** Script principal contendo a lógica do agente, Regex e validação HITL.
+- **`requirements.txt`:** Ficheiro de dependências Python do projeto ( `ollama` ).
+- **`README.md`:** Documentação completa do projeto.
 
-Teste de Conectividade: "Verifique se o IP 192.168.100.2 está acessível na rede."
+---
 
-Dúvidas Conceituais: "O que é o serviço vsftpd 2.3.4 e por que ele é considerado vulnerável?"
+## 🔧 Troubleshooting (Solução de Problemas)
 
-Autorização de Comandos (Fluxo HITL):
-Quando o Vyrux sugere a execução de um comando do terminal, ele interrompe o fluxo e solicita sua confirmação:
+- **Erro `Connection Refused` ao conectar ao Ollama:**
+  - O serviço do Ollama não está rodando. Abra outro terminal e execute `ollama serve`.
+- **Comando não executado pelo Vyrux:**
+  - O comando solicitado não está na *whitelist*. Apenas `ping`, `nmap`, `dig`, `traceroute` e `curl` são permitidos.
+- **Erro de permissão no Nmap:**
+  - Varreduras avançadas exigem `root`. Use varreduras padrão de serviços ( `nmap -sV` ) ou rode com `sudo`.
 
-Plaintext
-[Vyrux] Comando sugerido: nmap -sV 192.168.100.2
-Deseja executar este comando? (s/N):
-Digite s e pressione Enter para aprovar a execução.
+---
 
-Digite n (ou pressione Enter) para recusar.
+## 📝 Aprendizados e Limitações Identificadas
 
-Encerrar a Execução:
-Para sair do agente, digite sair ou exit a qualquer momento.
+- **Ajuste de System Prompt:** Modelos locais menores necessitam de prompts estritos para evitar formatação excessiva quando a saída precisa ser consumida por scripts.
+- **Raciocínio Encadeado:** Modelos de 1B parâmetros são excelentes para tradução direta de intenção para comando (*Text-to-CLI*), mas apresentam limitações ao tentar gerenciar fluxos complexos de auditoria de forma 100% autônoma.
 
-📂 Estrutura do Repositório
-Plaintext
-vyrux-agent/
-├── vyrux.py             # Script principal contendo a lógica do agente, Regex e validação HITL
-├── requirements.txt     # Dependências Python do projeto (ollama)
-└── README.md            # Documentação completa do projeto
-🔧 Troubleshooting (Solução de Problemas)
-Erro Connection Refused ao conectar ao Ollama:
-Certifique-se de que o serviço do Ollama está rodando em segundo plano digitando ollama serve em outro terminal.
+---
+*Projeto desenvolvido para fins educacionais e de pesquisa em cibersegurança.*
+EOF
 
-Comando não executado pelo Vyrux:
-O comando solicitado precisa estar contido na whitelist de segurança (ping, nmap, dig, traceroute, curl). Caso contrário, a execução é bloqueada por segurança.
-
-Erro de permissão no Nmap:
-Alguns tipos de varredura avançada do Nmap exigem privilégios de superusuário (sudo). Para varreduras normais de serviços (nmap -sV), permissões de usuário padrão são suficientes.
-
-📝 Aprendizados e Limitações Identificadas
-Ajuste de System Prompt: Modelos locais menores necessitam de prompts estritos para evitar a formatação excessiva em Markdown quando a saída precisa ser consumida por scripts.
-
-Raciocínio Encadeado: Modelos de 1B parâmetros são excelentes para tradução direta de intenção para comando (Text-to-CLI), mas apresentam limitações ao tentar gerenciar fluxos complexos e multi-etapas de auditoria de forma 100% autônoma.
-
-Projeto desenvolvido para fins educacionais e de pesquisa em cibersegurança.
+git add README.md
+git commit -m "style: padroniza todo o README com estilo de marcadores e inline code"
+git push
