@@ -1,6 +1,3 @@
-cd ~/vyrux-repo
-
-cat << 'EOF' > README.md
 # 🛡️ Vyrux — Local Cybersecurity Agent (PoC)
 
 **Vyrux** é uma Prova de Conceito (PoC) de um assistente local de cibersegurança focado na automação de diagnósticos de rede e análise de conectividade. O agente utiliza um Modelo de Linguagem Local (LLM) rodando via **Ollama** e uma interface de execução segura com autorização humana (*Human-in-the-Loop*).
