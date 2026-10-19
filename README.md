@@ -111,8 +111,3 @@ Siga os passos abaixo para preparar e executar o ambiente do Vyrux:
 
 ---
 *Projeto desenvolvido para fins educacionais e de pesquisa em cibersegurança.*
-EOF
-
-git add README.md
-git commit -m "style: padroniza todo o README com estilo de marcadores e inline code"
-git push
